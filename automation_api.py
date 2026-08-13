@@ -26,8 +26,7 @@ def norm_phone(phone: str) -> str:
 @app.post("/check-duplicates")
 async def check_duplicates(request: Request):
     """
-    Receives raw CSV text, checks each row against the SQLite DB,
-    returns which ones are duplicates.
+    Receives raw CSV text, checks each row against the SQLite DB, returns which ones are duplicates.
     """
     body = await request.body()
     csv_text = body.decode("utf-8")

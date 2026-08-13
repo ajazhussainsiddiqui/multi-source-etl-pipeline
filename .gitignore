@@ -2,3 +2,12 @@
 ConsultBae - AI Automation Assignment.pdf
 *.csv
 *.ipynb
+
+NISQA/
+*.tar
+*.pth
+*.pt
+*.ckpt
+
+tmp_dir/
+audio_uploads/

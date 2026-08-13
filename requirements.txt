@@ -1,5 +1,15 @@
 pandas==2.3.3
 SQLAlchemy==2.0.43
+
 fastapi==0.129.0
 uvicorn==0.41.0
 
+
+torch==2.2.1
+torchaudio==2.2.1
+torchvision==0.17.1
+
+nisqa==2.0.post2
+soundfile
+pyloudnorm
+mutagen
