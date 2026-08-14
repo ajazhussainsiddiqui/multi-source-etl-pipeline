@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Task 1 - Merge (core)
+Task 1: Merge (core)
 
 Merges 3 messy CSV sources into a single SQLite database using SQLAlchemy.
 Same person across multiple files becomes ONE record.
@@ -12,14 +12,12 @@ from datetime import datetime
 from collections import defaultdict, Counter
 from typing import Optional, List, Dict, Tuple
 
-from sqlalchemy import (
-    create_engine, Column, Integer, String, Float, 
-    Boolean, Date, DateTime, Text, ForeignKey
-)
+from sqlalchemy import (create_engine, Column, Integer, String, Float, Boolean, Date, DateTime, Text, ForeignKey)
 from sqlalchemy.orm import declarative_base, relationship, Session
 from sqlalchemy.sql import func
 
-
+import sys 
+sys.stdout.reconfigure(encoding='utf-8')  # fix the terminal charector printing issue
 
 # CONFIG
 
@@ -85,7 +83,7 @@ class SourceProvenance(Base):
 # NORMALIZATION HELPERS
 
 
-def norm_email(email: str) -> Optional[str]:
+def norm_email(email: str):
     if pd.isna(email) or str(email).strip() == "":
         return None
     e = str(email).strip().lower()
@@ -94,7 +92,7 @@ def norm_email(email: str) -> Optional[str]:
     return e
 
 
-def norm_phone(phone) -> Optional[str]:
+def norm_phone(phone):
     if pd.isna(phone) or str(phone).strip().lower() in ["", "phone number"]:
         return None
     p = re.sub(r"[^0-9]", "", str(phone).strip())
@@ -103,13 +101,13 @@ def norm_phone(phone) -> Optional[str]:
     return p if len(p) == 10 else None
 
 
-def norm_name(name: str) -> str:
+def norm_name(name: str):
     if pd.isna(name) or str(name).strip().lower() in ["", "name"]:
         return ""
     return str(name).strip().title()
 
 
-def norm_city(city: str) -> str:
+def norm_city(city: str):
     if pd.isna(city) or str(city).strip().lower() in ["", "city"]:
         return ""
     c = re.sub(r"\s+", " ", str(city).strip().lower()).strip()
@@ -127,7 +125,7 @@ def norm_city(city: str) -> str:
     return city_map.get(c, c.title())
 
 
-def parse_date(date_str: str) -> Optional[datetime]:
+def parse_date(date_str: str):
     if pd.isna(date_str) or str(date_str).strip() == "":
         return None
     d = str(date_str).strip()
@@ -143,7 +141,7 @@ def parse_date(date_str: str) -> Optional[datetime]:
     return None
 
 
-def parse_ctc(ctc_val) -> Optional[int]:
+def parse_ctc(ctc_val):
     """Convert CTC to annual INR. Handles raw rupees and lakhs."""
     if pd.isna(ctc_val):
         return None
@@ -155,7 +153,7 @@ def parse_ctc(ctc_val) -> Optional[int]:
     return int(val * 100000) if val < 100 else int(val)
 
 
-def parse_rate(rate_str: str) -> Tuple[Optional[float], Optional[str]]:
+def parse_rate(rate_str: str):
     if pd.isna(rate_str) or str(rate_str).strip() == "":
         return None, None
     r = str(rate_str).strip().lower()
@@ -173,14 +171,14 @@ def parse_rate(rate_str: str) -> Tuple[Optional[float], Optional[str]]:
     return num, unit
 
 
-def norm_skills(skills_str: str) -> List[str]:
+def norm_skills(skills_str: str):
     if pd.isna(skills_str) or str(skills_str).strip() == "":
         return []
     skills = [s.strip().title() for s in str(skills_str).split(",")]
     return list(dict.fromkeys(skills))
 
 
-def norm_verified(v) -> Optional[bool]:
+def norm_verified(v):
     if pd.isna(v):
         return None
     v_str = str(v).strip().lower()
@@ -191,16 +189,13 @@ def norm_verified(v) -> Optional[bool]:
     return None
 
 
-def norm_status(s) -> Optional[str]:
+def norm_status(s):
     if pd.isna(s):
         return None
     s_str = str(s).strip().lower()
     mapping = {"active": "Active", "inactive": "Inactive", "paused": "Paused"}
     return mapping.get(s_str, s_str.title())
 
-
-
-# UNION-FIND FOR DEDUPLICATION
 
 
 class UnionFind:
@@ -231,7 +226,7 @@ class UnionFind:
 # MERGE LOGIC
 
 
-def merge_cluster(members: List[Dict]) -> Dict:
+def merge_cluster(members):
     emails, phones, cities, skills = set(), set(), set(), set()
     names = []
     experience = ctc = applied_date = rate_val = rate_unit = status = None
@@ -335,14 +330,14 @@ def run_pipeline():
     print("Task 1 - Merge Pipeline")
     print("=" * 60)
     
-    # --- Load ---
+    #  Load 
     print("\n[1/6] Loading raw CSVs...")
     s1_raw = pd.read_csv(SOURCE1)
     s2_raw = pd.read_csv(SOURCE2)
     s3_raw = pd.read_csv(SOURCE3)
     print(f"      S1: {s1_raw.shape[0]} rows | S2: {s2_raw.shape[0]} rows | S3: {s3_raw.shape[0]} rows")
     
-    # --- Clean Source 1 ---
+    #  Clean Source 1 
     print("\n Cleaning Source 1 (Naukri)...")
     s1 = s1_raw.copy()
     s1["norm_email"] = s1["Email"].apply(norm_email)
@@ -355,7 +350,7 @@ def run_pipeline():
     s1 = s1.dropna(subset=["norm_email", "norm_phone"], how="all")
     print(f"      Clean: {len(s1)} rows")
     
-    # --- Clean Source 2 ---
+    #  Clean Source 2 
     print("\n Cleaning Source 2 (Gig Workers)...")
     s2 = s2_raw.copy()
     s2 = s2.dropna(subset=["email_id", "worker_name"], how="all")
@@ -369,7 +364,7 @@ def run_pipeline():
     s2 = s2.dropna(subset=["norm_email"])
     print(f"      Clean: {len(s2)} rows (dropped empty + malformed rows)")
     
-    # --- Clean Source 3 ---
+    # Clean Source 3 
     print("\n Cleaning Source 3 (CBNexus)...")
     s3 = s3_raw.copy()
     s3 = s3[s3["Name"].str.strip().str.lower() != "name"]  # drop duplicate header
@@ -381,7 +376,7 @@ def run_pipeline():
     s3 = s3.dropna(subset=["norm_phone"])
     print(f"      Clean: {len(s3)} rows (dropped duplicate header row)")
     
-    # --- Build matching graph ---
+    #  Build matching graph 
     print("\n Deduplicating with Union-Find...")
     uf = UnionFind()
     records = []
@@ -457,7 +452,7 @@ def run_pipeline():
     source_dist = Counter(len(m) for m in clusters.values())
     print(f"      Cluster sizes: {dict(source_dist)}")
     
-    # --- Merge ---
+    #  Merge 
     print("\n Writing to SQLite via SQLAlchemy...")
     engine = create_engine(f"sqlite:///{DB_PATH}", echo=False)
     Base.metadata.drop_all(engine)
@@ -510,7 +505,7 @@ def run_pipeline():
         
         session.commit()
     
-    # --- Verification ---
+    #  Verification 
     with Session(engine) as session:
         total = session.query(Person).count()
         s1_only = session.query(Person).filter(

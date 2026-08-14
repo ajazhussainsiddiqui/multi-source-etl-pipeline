@@ -1,19 +1,15 @@
-#!/usr/bin/env python3
 """
-Task 3 — Mini Audio Collection App (Minimal)
+Task 3: Mini Audio Collection App 
 """
 
-import os
 import re
-import json
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-
 import streamlit as st
-import numpy as np
 
-# ── Advanced Audio Analysis ─────────────────────────────────
+
+#  Advanced (Deep Learning) Audio Analysis 
 import torch
 import torchaudio
 import soundfile as sf
@@ -62,7 +58,7 @@ def analyze_audio(file_path):
     nisqa = nisqaModel({
         "mode": "predict_file",
         "deg": file_path,
-        "output_dir": "tmp_dir",  # create a temperary result storage csv file
+        "output_dir": "",  # this will create a temperary result storage csv file in home directory
         "pretrained_model": "NISQA/weights/nisqa_mos_only.tar",
         "num_workers": 0,
         "bs": 1,
@@ -88,13 +84,13 @@ def analyze_audio(file_path):
     }
 
 
-# ── Config ──
+#  Config 
 DB_PATH = "merged.db"
 AUDIO_DIR = Path("audio_uploads")
 AUDIO_DIR.mkdir(exist_ok=True)
 
 
-# ── DB ──
+#  DB
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     conn.execute("""
@@ -151,7 +147,8 @@ def get_all_submissions():
     return rows
 
 
-# ── UI ──
+# Streamlit UI
+ 
 def page_submit():
     st.header("🎙️ Submit Audio")
 
@@ -168,7 +165,7 @@ def page_submit():
         with tab2:
             uploaded = st.file_uploader("Upload audio", type=["wav", "mp3", "ogg", "m4a", "flac"])
 
-        submitted = st.form_submit_button("🚀 Submit", use_container_width=True)
+        submitted = st.form_submit_button("🚀 Submit [Analysis]", use_container_width=True)
 
     if not submitted:
         return

@@ -14,8 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def norm_phone(phone: str) -> str:
-    """Same normalization as Task 1."""
+def norm_phone(phone: str):
     if not phone:
         return ""
     p = re.sub(r"[^0-9]", "", str(phone).strip())

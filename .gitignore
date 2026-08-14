@@ -1,6 +1,4 @@
 .vscode
-ConsultBae - AI Automation Assignment.pdf
-*.csv
 *.ipynb
 
 NISQA/
@@ -9,5 +7,4 @@ NISQA/
 *.pt
 *.ckpt
 
-tmp_dir/
 audio_uploads/

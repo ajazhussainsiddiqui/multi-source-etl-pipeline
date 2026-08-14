@@ -1,15 +1,16 @@
-pandas==2.3.3
+numpy==1.26.4
+pandas==2.2.1
 SQLAlchemy==2.0.43
 
 fastapi==0.129.0
 uvicorn==0.41.0
 
 
-torch==2.2.1
-torchaudio==2.2.1
-torchvision==0.17.1
-
+torch==2.2.1+cu118
+torchaudio==2.2.1+cu118
+torchvision==0.17.1+cu118
 nisqa==2.0.post2
-soundfile
-pyloudnorm
-mutagen
+soundfile==0.13.1
+pyloudnorm==0.2.0
+mutagen==1.48.1
+streamlit==1.45.1
