@@ -157,7 +157,7 @@ See [`task4_DATA_ISSUES_REPORT.md`](task4_DATA_ISSUES_REPORT.md) for the full br
 
 ### 7. Task 5: Stretch
 
-See `[task5.pdf](task5.pdf)` for the one-page "what breaks at 5,000 users (workers)" analysis.
+See [`task5.pdf`](task5.pdf) for the one-page "what breaks at 5,000 users (workers)" analysis.
 
 ---
 
