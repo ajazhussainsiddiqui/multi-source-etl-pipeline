@@ -234,6 +234,5 @@ I spent about 3 hours going back and forth with AI's, pasting each stack trace, 
 
 ---
 
-- **Video link:** [Loom / screen recording link goes here]
 
 
